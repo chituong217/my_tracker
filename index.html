@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Tracker 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navigation-bar">
+        <button class="nav-button" onclick="showSection('home')">Trang Chủ</button>
+        <button class="nav-button" onclick="showSection('fitness')">Thể Dục</button>
+        <button class="nav-button" onclick="showSection('japanese')">Tiếng Nhật</button>
+        <button class="nav-button" onclick="showSection('countdown')">Đếm Ngược</button>
+    </nav>
+
+    <section id="home-section" class="content-section active-section">
+        <h1>Chào mừng trở lại! :v</h1>
+        <p>Hiện tại trang này đang để trống, mốt thêm sau nha bro.</p>
+    </section>
+
+    <section id="fitness-section" class="content-section" style="display: none;">
+        <h1>Fitness Tracker 💪</h1>
+        
+        <div class="tracker-container">
+            <h2>Tiến độ tập luyện (Github Style)</h2>
+            <p>Streak hiện tại: <span id="fitness-streak-count" class="highlight-text">0</span> ngày 🔥</p>
+            <button class="action-button" onclick="checkInToday('fitness')">✅ Check-in Hôm Nay</button>
+            
+            <div id="fitness-heatmap" class="heatmap-grid"></div>
+        </div>
+
+        <hr>
+
+        <div class="log-container">
+            <h2>Nhật ký bài tập (AI Log)</h2>
+            <textarea id="fitness-log-input" placeholder="Dán log bài tập từ AI vào đây..."></textarea>
+            <button class="action-button" onclick="saveFitnessLog()">Lưu Log</button>
+            
+            <div id="fitness-log-list" class="log-list">
+                </div>
+        </div>
+    </section>
+
+    <section id="japanese-section" class="content-section" style="display: none;">
+        <h1>Japanese Learning 🇯🇵</h1>
+        <div class="tracker-container">
+            <h2>Tiến độ học tiếng Nhật</h2>
+            <p>Streak hiện tại: <span id="japanese-streak-count" class="highlight-text">0</span> ngày 🔥</p>
+            <button class="action-button" onclick="checkInToday('japanese')">✅ Check-in Hôm Nay</button>
+            
+            <div id="japanese-heatmap" class="heatmap-grid"></div>
+        </div>
+    </section>
+
+    <section id="countdown-section" class="content-section" style="display: none;">
+        <h1>Countdown Sự Kiện ⏳</h1>
+        
+        <div class="add-event-box">
+            <input type="text" id="event-name" placeholder="Tên sự kiện (Vd: Thi cuối kỳ)">
+            <input type="datetime-local" id="event-date">
+            <input type="color" id="event-color" value="#ffb74d">
+            <button class="action-button" onclick="addNewEvent()">Thêm Sự Kiện</button>
+        </div>
+
+        <div id="countdown-list" class="countdown-container">
+            </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
