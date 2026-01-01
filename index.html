@@ -3,48 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Tracker 2026</title>
+    <title>My Tracker 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <nav class="navigation-bar">
-        <button class="nav-button" onclick="switchTab('home')">Trang Chủ</button>
-        <button class="nav-button" onclick="switchTab('fitness')">Thể Dục</button>
-        <button class="nav-button" onclick="switchTab('japanese')">Tiếng Nhật</button>
-        <button class="nav-button" onclick="switchTab('countdown')">Đếm Ngược</button>
+        <button class="nav-button" onclick="openTab('home')">Trang Chủ</button>
+        <button class="nav-button" onclick="openTab('fitness')">Thể Dục</button>
+        <button class="nav-button" onclick="openTab('japanese')">Tiếng Nhật</button>
+        <button class="nav-button" onclick="openTab('countdown')">Đếm Ngược</button>
     </nav>
 
     <section id="home-section" class="content-section">
-        <h1>Welcome Home Bro! :v</h1>
-        <p>Chọn tab phía trên để bắt đầu tracking nha.</p>
+        <h1>Welcome Home! 🏠</h1>
+        <p>Chọn các tab phía trên để bắt đầu theo dõi nha bro.</p>
+        <p>Hôm nay là: <span id="display-today" class="highlight-text">--/--/----</span></p>
     </section>
 
     <section id="fitness-section" class="content-section" style="display: none;">
         <h1>Fitness Tracker 💪</h1>
         
         <div class="tracker-layout">
-            <div class="heatmap-container">
+            <div class="left-panel">
                 <h2>Tiến độ (Heatmap)</h2>
-                <p>Streak: <span id="fitness-streak" class="highlight-text">0</span> 🔥</p>
-                <div id="fitness-heatmap" class="heatmap-grid"></div>
+                <p>Streak hiện tại: <span id="fitness-streak" class="highlight-text">0</span> 🔥</p>
+                <div id="fitness-heatmap" class="heatmap-grid">
+                    </div>
             </div>
 
-            <div class="detail-panel">
-                <h3 id="fitness-selected-date">Chọn một ngày...</h3>
+            <div class="right-panel">
+                <h3 id="fitness-selected-date-display">Hãy chọn một ngày...</h3>
                 
-                <div class="control-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="fitness-status-checkbox">
+                <div class="control-box">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="fitness-checkbox">
                         <span class="checkmark"></span>
-                        Đã hoàn thành hôm nay?
+                        Đã tập xong hôm nay?
                     </label>
                 </div>
 
-                <textarea id="fitness-log-input" placeholder="Log bài tập cho ngày này..."></textarea>
+                <textarea id="fitness-note" placeholder="Dán log bài tập từ AI vào đây..."></textarea>
                 
-                <button class="action-button" onclick="saveDataForDate('fitness')">Lưu Thông Tin</button>
+                <button class="action-button" onclick="saveData('fitness')">Lưu Dữ Liệu</button>
             </div>
         </div>
     </section>
@@ -53,39 +55,42 @@
         <h1>Japanese Learning 🇯🇵</h1>
         
         <div class="tracker-layout">
-            <div class="heatmap-container">
+            <div class="left-panel">
                 <h2>Tiến độ (Heatmap)</h2>
-                <p>Streak: <span id="japanese-streak" class="highlight-text">0</span> 🔥</p>
+                <p>Streak hiện tại: <span id="japanese-streak" class="highlight-text">0</span> 🔥</p>
                 <div id="japanese-heatmap" class="heatmap-grid"></div>
             </div>
 
-            <div class="detail-panel">
-                <h3 id="japanese-selected-date">Chọn một ngày...</h3>
+            <div class="right-panel">
+                <h3 id="japanese-selected-date-display">Hãy chọn một ngày...</h3>
                 
-                <div class="control-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="japanese-status-checkbox">
+                <div class="control-box">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="japanese-checkbox">
                         <span class="checkmark"></span>
-                        Đã học hôm nay?
+                        Đã học xong hôm nay?
                     </label>
                 </div>
 
-                <textarea id="japanese-log-input" placeholder="Log bài học cho ngày này..."></textarea>
+                <textarea id="japanese-note" placeholder="Ghi chú bài học hôm nay..."></textarea>
                 
-                <button class="action-button" onclick="saveDataForDate('japanese')">Lưu Thông Tin</button>
+                <button class="action-button" onclick="saveData('japanese')">Lưu Dữ Liệu</button>
             </div>
         </div>
     </section>
 
     <section id="countdown-section" class="content-section" style="display: none;">
         <h1>Countdown Sự Kiện ⏳</h1>
-        <div class="add-event-box">
-            <input type="text" id="event-name" placeholder="Tên sự kiện">
-            <input type="datetime-local" id="event-date">
+        
+        <div class="add-event-form">
+            <input type="text" id="event-name" placeholder="Tên sự kiện (Vd: Thi cuối kỳ)">
+            <input type="datetime-local" id="event-time">
             <input type="color" id="event-color" value="#ffb74d">
-            <button class="action-button" onclick="addNewEvent()">Thêm</button>
+            <button class="action-button" onclick="addEvent()">Thêm Sự Kiện</button>
         </div>
-        <div id="countdown-list" class="countdown-container"></div>
+
+        <div id="countdown-list" class="countdown-list">
+            </div>
     </section>
 
     <script src="script.js"></script>
