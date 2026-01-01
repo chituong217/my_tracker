@@ -1,196 +1,33 @@
-/* Reset mặc định */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: #fff8e1; color: #4e342e; padding: 20px; }
 
-body {
-    font-family: 'Nunito', sans-serif;
-    background-color: #fff8e1; /* Nền kem */
-    color: #4e342e; /* Chữ nâu đất */
-    padding: 20px;
-}
+/* Menu */
+.navigation-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; background: #ffe0b2; padding: 15px; border-radius: 15px; flex-wrap: wrap; }
+.nav-button { background: white; border: 2px solid #ffb74d; color: #e65100; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+.nav-button:hover { background: #ffb74d; color: white; }
 
-/* --- THANH MENU --- */
-.navigation-bar {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 25px;
-    background-color: #ffe0b2; /* Cam nhạt */
-    padding: 15px;
-    border-radius: 15px;
-    flex-wrap: wrap; /* Tự xuống dòng trên điện thoại */
-}
+/* Section */
+.content-section { background: white; max-width: 1000px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+h1, h2, h3 { color: #ef6c00; margin-bottom: 15px; }
 
-.nav-button {
-    background-color: white;
-    border: 2px solid #ffb74d;
-    color: #e65100;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    transition: 0.3s;
-}
+/* Layout 2 cột */
+.tracker-layout { display: flex; gap: 20px; flex-wrap: wrap; }
+.left-panel { flex: 2; min-width: 300px; }
+.right-panel { flex: 1; min-width: 250px; background: #fff3e0; padding: 20px; border-radius: 15px; height: fit-content; }
 
-.nav-button:hover {
-    background-color: #ffb74d;
-    color: white;
-}
+/* Heatmap Grid */
+.heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(20px, 1fr)); gap: 4px; margin-top: 10px; }
+.heatmap-box { width: 20px; height: 20px; background: #eee; border-radius: 3px; cursor: pointer; }
+.heatmap-box:hover { border: 1px solid #e65100; transform: scale(1.2); }
+.heatmap-box.done { background: #ff9800; } /* Màu đã làm */
+.heatmap-box.active { border: 2px solid #bf360c; transform: scale(1.1); } /* Màu đang chọn */
 
-/* --- KHUNG NỘI DUNG CHÍNH --- */
-.content-section {
-    background: white;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 5px 15px rgba(255, 167, 38, 0.2);
-    /* Mặc định ẩn, JS sẽ hiện lên sau */
-    animation: slideUp 0.4s ease-out;
-}
+/* Form Elements */
+textarea { width: 100%; height: 120px; padding: 10px; border: 2px solid #ffe0b2; border-radius: 10px; margin: 10px 0; font-family: inherit; }
+.control-box { margin: 10px 0; font-weight: bold; color: #e65100; display: flex; align-items: center; gap: 10px; }
+.action-button { width: 100%; padding: 10px; background: #ffb74d; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.action-button:hover { background: #fb8c00; }
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-h1, h2, h3 {
-    color: #ef6c00;
-    margin-bottom: 15px;
-}
-
-.highlight-text {
-    color: #e65100;
-    font-weight: 800;
-    font-size: 1.2em;
-}
-
-/* --- LAYOUT 2 CỘT (TRACKER) --- */
-.tracker-layout {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap; /* Xuống dòng nếu màn hình nhỏ */
-}
-
-.left-panel {
-    flex: 2; /* Chiếm 2 phần */
-    min-width: 300px;
-}
-
-.right-panel {
-    flex: 1; /* Chiếm 1 phần */
-    min-width: 280px;
-    background-color: #fff3e0;
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #ffe0b2;
-    height: fit-content;
-}
-
-/* --- HEATMAP (LƯỚI Ô VUÔNG) --- */
-.heatmap-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(18px, 1fr));
-    gap: 4px;
-    margin-top: 10px;
-}
-
-.heatmap-box {
-    width: 18px;
-    height: 18px;
-    background-color: #eeeeee;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.heatmap-box:hover {
-    border: 1px solid #ff9800;
-    transform: scale(1.2);
-}
-
-/* Ô đã hoàn thành (Màu cam) */
-.heatmap-box.done {
-    background-color: #ff9800;
-}
-
-/* Ô đang được click chọn (Viền đỏ đậm) */
-.heatmap-box.selected {
-    border: 2px solid #bf360c;
-    transform: scale(1.1);
-}
-
-/* --- FORM NHẬP LIỆU --- */
-textarea {
-    width: 100%;
-    height: 150px;
-    padding: 10px;
-    border: 2px solid #ffe0b2;
-    border-radius: 10px;
-    margin: 10px 0;
-    font-family: inherit;
-    resize: vertical;
-}
-
-.control-box {
-    margin: 15px 0;
-}
-
-.checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    color: #e65100;
-}
-
-.checkbox-wrapper input {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    accent-color: #ff9800;
-}
-
-.action-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #ffb74d;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.action-button:hover {
-    background-color: #fb8c00;
-}
-
-/* --- COUNTDOWN --- */
-.add-event-form {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.countdown-item {
-    background-color: #fff3e0;
-    border: 2px solid #ffcc80;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.timer-number {
-    font-size: 1.5em;
-    font-weight: bold;
-    font-family: monospace;
-    color: #d84315;
-}
+/* Countdown */
+.add-event-box { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.countdown-item { background: #fff3e0; border: 2px solid; padding: 15px; margin-bottom: 10px; border-radius: 10px; text-align: center; }
