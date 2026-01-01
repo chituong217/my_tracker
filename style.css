@@ -1,145 +1,95 @@
-/* Reset cơ bản */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* --- GIỮ NGUYÊN CODE CŨ TỪ ĐẦU ĐẾN PHẦN ACTION-BUTTON --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background-color: #fff8e1; color: #4a4a4a; padding: 20px; }
+.navigation-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; background-color: #ffe0b2; padding: 15px; border-radius: 15px; }
+.nav-button { background-color: white; border: 2px solid #ffb74d; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; color: #e65100; transition: all 0.3s; }
+.nav-button:hover { background-color: #ffb74d; color: white; }
+.content-section { max-width: 1000px; /* Tăng chiều rộng để chứa 2 cột */ margin: 0 auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 183, 77, 0.2); animation: fadeIn 0.5s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+h1, h2, h3 { color: #ef6c00; margin-bottom: 15px; }
+.highlight-text { font-size: 1.5em; color: #e65100; font-weight: 800; }
+.action-button { background-color: #ffb74d; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; width: 100%; }
+.action-button:hover { background-color: #fb8c00; }
 
-body {
-    font-family: 'Nunito', sans-serif; /* Font tròn trịa dễ thương */
-    background-color: #fff8e1; /* Màu nền kem nhạt */
-    color: #4a4a4a;
-    padding: 20px;
-}
-
-/* Navigation Bar */
-.navigation-bar {
+/* --- PHẦN MỚI: TRACKER LAYOUT (2 CỘT) --- */
+.tracker-layout {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    background-color: #ffe0b2; /* Cam pastel nhạt */
-    padding: 15px;
+    gap: 30px;
+    flex-wrap: wrap; /* Tự xuống dòng nếu màn hình nhỏ */
+}
+
+.heatmap-container {
+    flex: 2; /* Chiếm 2 phần */
+    min-width: 300px;
+}
+
+.detail-panel {
+    flex: 1; /* Chiếm 1 phần */
+    min-width: 250px;
+    background-color: #fff3e0;
+    padding: 20px;
     border-radius: 15px;
+    border: 2px solid #ffe0b2;
+    height: fit-content;
 }
 
-.nav-button {
-    background-color: white;
-    border: 2px solid #ffb74d;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #e65100;
-    transition: all 0.3s;
-}
-
-.nav-button:hover {
-    background-color: #ffb74d;
-    color: white;
-}
-
-/* Section styling */
-.content-section {
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(255, 183, 77, 0.2);
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-h1, h2 {
-    color: #ef6c00;
-    margin-bottom: 20px;
-}
-
-.highlight-text {
-    font-size: 1.5em;
-    color: #e65100;
-    font-weight: 800;
-}
-
-.action-button {
-    background-color: #ffb74d;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-.action-button:hover {
-    background-color: #fb8c00;
-}
-
-/* Heatmap Grid (Github Style) */
+/* Heatmap Grid */
 .heatmap-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15px, 1fr)); /* Tự chia cột */
-    gap: 4px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(20px, 1fr)); /* Ô to hơn xíu */
+    gap: 5px;
+    margin-top: 10px;
 }
 
 .heatmap-box {
-    width: 15px;
-    height: 15px;
-    background-color: #eee; /* Màu xám khi chưa tập */
-    border-radius: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: #eee;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.heatmap-box:hover {
+    transform: scale(1.3); /* Phóng to khi lia chuột */
+    border: 1px solid #ff9800;
+    z-index: 10; /* Nổi lên trên */
 }
 
 .heatmap-box.active {
-    background-color: #ff9800; /* Màu cam khi đã tập */
-    box-shadow: 0 0 5px #ffcc80;
+    background-color: #ff9800;
 }
 
-/* Log Box */
+.heatmap-box.selected {
+    border: 2px solid #e65100; /* Viền đậm cho ô đang chọn */
+    transform: scale(1.2);
+}
+
+/* Input Log Box */
 textarea {
     width: 100%;
-    height: 100px;
+    height: 150px;
     padding: 10px;
     border: 2px solid #ffe0b2;
     border-radius: 10px;
     margin-bottom: 10px;
+    margin-top: 10px;
     font-family: inherit;
+    resize: vertical;
 }
 
-.log-item {
-    background-color: #fff3e0;
-    padding: 15px;
-    border-left: 5px solid #ffb74d;
-    margin-bottom: 10px;
-    white-space: pre-wrap; /* Giữ nguyên xuống dòng của log */
-    border-radius: 5px;
-}
-
-/* Countdown Box */
-.add-event-box {
+/* Checkbox to bự dễ bấm */
+.control-group { margin: 15px 0; }
+.checkbox-container {
     display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
+    align-items: center;
+    cursor: pointer;
+    font-size: 18px;
+    user-select: none;
 }
+.checkbox-container input { margin-right: 10px; transform: scale(1.5); accent-color: #ff9800; }
 
-.countdown-item {
-    background-color: #fff3e0;
-    padding: 20px;
-    margin-bottom: 15px;
-    border-radius: 15px;
-    border: 2px solid;
-    text-align: center;
-}
-
-.timer-display {
-    font-size: 2em;
-    font-weight: bold;
-    font-family: monospace;
-}
+/* Phần Countdown */
+.add-event-box { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+.countdown-item { background-color: #fff3e0; padding: 20px; margin-bottom: 15px; border-radius: 15px; border: 2px solid; text-align: center; }
+.timer-display { font-size: 2em; font-weight: bold; font-family: monospace; }
