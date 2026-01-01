@@ -1,379 +1,199 @@
-// --- 1. BIẾN TOÀN CỤC ---
-// Biến này để lưu ngày mà ông đang click chuột vào
-let currentSelectedDate = ""; 
-// Biến này lưu bộ đếm thời gian để tránh bị chạy trùng lặp
-let countdownTimerId = null; 
+// --- BIẾN TOÀN CỤC ---
+let currentSelectedDate = ""; // Ngày đang chọn
+let countdownInterval = null; // Biến giữ đồng hồ đếm ngược
 
-// --- 2. HÀM KHỞI TẠO (CHẠY KHI WEB LOAD XONG) ---
+// --- KHI TRANG WEB LOAD XONG ---
 window.onload = function() {
-    // Mặc định mở trang Home trước
-    openTab('home');
+    console.log("Script V3 loaded successfully!"); // Check log xem script chạy chưa
+    
+    // 1. Hiện ngày hôm nay ở trang chủ
+    document.getElementById('today-display').innerText = getTodayStr();
 
-    // Hiển thị ngày hôm nay ở trang chủ
-    const todayStr = getTodayString();
-    const displayElement = document.getElementById('display-today');
-    if (displayElement != null) {
-        displayElement.innerText = todayStr;
-    }
+    // 2. Mặc định vào trang Home
+    switchTab('home');
 
-    // Bắt đầu chạy đồng hồ đếm ngược
-    startCountdownLoop();
+    // 3. Bắt đầu đếm ngược
+    startCountdown();
 };
 
-// --- 3. HÀM CHUYỂN TAB (NAVIGATION) ---
-function openTab(tabName) {
-    // Danh sách tên các section
-    const allTabs = ['home', 'fitness', 'japanese', 'countdown'];
-
-    // 1. Ẩn tất cả các tab đi
-    for (let i = 0; i < allTabs.length; i++) {
-        const id = allTabs[i] + '-section';
-        const section = document.getElementById(id);
-        if (section != null) {
-            section.style.display = 'none';
-        }
+// --- HÀM CHUYỂN TAB (ĐÃ FIX LỖI LIỆT NÚT) ---
+function switchTab(tabName) {
+    // Ẩn hết các section
+    const sections = document.querySelectorAll('.content-section');
+    for (let i = 0; i < sections.length; i++) {
+        sections[i].style.display = 'none';
     }
 
-    // 2. Hiện tab được chọn
-    const selectedId = tabName + '-section';
-    const selectedSection = document.getElementById(selectedId);
-    if (selectedSection != null) {
-        selectedSection.style.display = 'block';
+    // Hiện section được chọn
+    const activeSection = document.getElementById(tabName + '-section');
+    if (activeSection) {
+        activeSection.style.display = 'block';
+    } else {
+        console.error("Không tìm thấy tab: " + tabName);
+        return;
     }
 
-    // 3. Nếu vào trang Fitness hoặc Japanese thì vẽ Heatmap và chọn ngày hôm nay
-    if (tabName == 'fitness' || tabName == 'japanese') {
+    // Nếu vào trang Fitness hoặc Japanese thì load dữ liệu ngay
+    if (tabName === 'fitness' || tabName === 'japanese') {
         renderHeatmap(tabName);
-        
-        // Tự động chọn ngày hôm nay để người dùng đỡ phải tìm
-        const today = getTodayString();
-        selectDate(tabName, today);
-    }
-
-    // 4. Nếu vào trang Countdown thì vẽ danh sách sự kiện
-    if (tabName == 'countdown') {
-        renderCountdownList();
+        // Tự động chọn ngày hôm nay
+        selectDate(tabName, getTodayStr());
     }
 }
 
-// --- 4. CÁC HÀM HỖ TRỢ NGÀY THÁNG ---
-// Trả về chuỗi ngày hôm nay dạng "YYYY-MM-DD"
-function getTodayString() {
+// --- HÀM XỬ LÝ NGÀY THÁNG ---
+function getTodayStr() {
     const d = new Date();
-    const year = d.getFullYear();
-    // Tháng bắt đầu từ 0 nên phải +1, thêm số 0 đằng trước nếu < 10
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return year + "-" + month + "-" + day;
+    // Chỉnh múi giờ VN cho chắc ăn
+    const offset = d.getTimezoneOffset() * 60000;
+    const local = new Date(d.getTime() - offset);
+    return local.toISOString().split('T')[0];
 }
 
-// Tạo danh sách tất cả các ngày trong năm nay
-function getAllDaysInYear(year) {
-    const listDays = [];
-    // Bắt đầu từ ngày 1 tháng 1
-    const date = new Date(year, 0, 1);
-
-    while (date.getFullYear() == year) {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        const dateString = y + "-" + m + "-" + d;
-        
-        listDays.push(dateString);
-
-        // Tăng thêm 1 ngày
-        date.setDate(date.getDate() + 1);
+function getDaysInYear(year) {
+    const days = [];
+    const d = new Date(year, 0, 1);
+    while (d.getFullYear() === year) {
+        const iso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        days.push(iso);
+        d.setDate(d.getDate() + 1);
     }
-    return listDays;
+    return days;
 }
 
-// --- 5. LOGIC HEATMAP (LƯỚI Ô VUÔNG) ---
-function renderHeatmap(category) {
-    // Tìm thẻ chứa heatmap
-    const containerId = category + '-heatmap';
-    const container = document.getElementById(containerId);
-    
-    // Xóa nội dung cũ
-    container.innerHTML = "";
+// --- LOGIC HEATMAP (LƯỚI) ---
+function renderHeatmap(type) {
+    const container = document.getElementById(type + '-heatmap');
+    container.innerHTML = ""; // Xóa cũ
 
-    // Lấy dữ liệu từ LocalStorage
-    const data = loadDataFromStorage(category);
+    const allData = JSON.parse(localStorage.getItem(type + '_data') || "{}");
+    const yearDays = getDaysInYear(new Date().getFullYear());
+    let streak = 0;
 
-    // Lấy danh sách ngày trong năm hiện tại
-    const currentYear = new Date().getFullYear();
-    const allDays = getAllDaysInYear(currentYear);
+    for (let i = 0; i < yearDays.length; i++) {
+        const day = yearDays[i];
+        const div = document.createElement('div');
+        div.className = 'heatmap-box';
+        div.title = day;
 
-    // Vòng lặp tạo ô vuông
-    for (let i = 0; i < allDays.length; i++) {
-        const dateStr = allDays[i];
-        
-        // Tạo thẻ div
-        const box = document.createElement('div');
-        
-        // Mặc định class cơ bản
-        box.className = 'heatmap-box';
-        // Thêm tooltip khi di chuột
-        box.title = "Ngày: " + dateStr;
-
-        // Kiểm tra xem ngày này đã làm chưa
-        // Dữ liệu lưu dạng: { "2026-01-01": { isDone: true, note: "..." } }
-        const dayInfo = data[dateStr];
-        if (dayInfo != null && dayInfo.isDone == true) {
-            box.classList.add('done'); // Thêm class màu cam
+        // Nếu có dữ liệu và đã done
+        if (allData[day] && allData[day].done) {
+            div.classList.add('done');
         }
 
-        // Nếu ngày này đang được chọn thì thêm viền đỏ
-        if (dateStr == currentSelectedDate) {
-            box.classList.add('selected');
+        // Nếu là ngày đang chọn
+        if (day === currentSelectedDate) {
+            div.classList.add('active');
         }
 
-        // Sự kiện khi click vào ô
-        box.onclick = function() {
-            selectDate(category, dateStr);
+        // Sự kiện Click
+        div.onclick = function() {
+            selectDate(type, day);
         };
 
-        // Gắn vào container
-        container.appendChild(box);
-    }
-
-    // Tính toán streak
-    calculateStreak(category, data);
-}
-
-// --- 6. LOGIC XỬ LÝ DỮ LIỆU (CLICK & SAVE) ---
-// Hàm chạy khi click vào 1 ô vuông
-function selectDate(category, dateStr) {
-    // Cập nhật biến toàn cục
-    currentSelectedDate = dateStr;
-
-    // Vẽ lại Heatmap để cập nhật viền đỏ (ô đang chọn)
-    renderHeatmap(category);
-
-    // Hiển thị ngày lên tiêu đề bên phải
-    const titleId = category + '-selected-date-display';
-    const title = document.getElementById(titleId);
-    if (title != null) {
-        title.innerText = "Đang xem ngày: " + dateStr;
-    }
-
-    // Lấy dữ liệu của ngày đó đổ vào Form
-    const data = loadDataFromStorage(category);
-    const dayInfo = data[dateStr];
-
-    const checkboxId = category + '-checkbox';
-    const noteId = category + '-note';
-
-    const checkbox = document.getElementById(checkboxId);
-    const textarea = document.getElementById(noteId);
-
-    if (dayInfo != null) {
-        // Nếu đã có dữ liệu
-        checkbox.checked = dayInfo.isDone;
-        textarea.value = dayInfo.note;
-    } else {
-        // Nếu chưa có dữ liệu (trang mới)
-        checkbox.checked = false;
-        textarea.value = "";
-    }
-}
-
-// Hàm chạy khi bấm nút "Lưu Dữ Liệu"
-function saveData(category) {
-    // Kiểm tra xem đã chọn ngày chưa
-    if (currentSelectedDate == "") {
-        alert("Chưa chọn ngày nào cả bro!");
-        return;
-    }
-
-    // Lấy giá trị từ Form
-    const checkboxId = category + '-checkbox';
-    const noteId = category + '-note';
-
-    const checkbox = document.getElementById(checkboxId);
-    const textarea = document.getElementById(noteId);
-
-    const isDoneValue = checkbox.checked;
-    const noteValue = textarea.value;
-
-    // Lấy toàn bộ dữ liệu cũ ra
-    const data = loadDataFromStorage(category);
-
-    // Cập nhật dữ liệu cho ngày đang chọn
-    data[currentSelectedDate] = {
-        isDone: isDoneValue,
-        note: noteValue
-    };
-
-    // Lưu ngược lại vào LocalStorage
-    const storageKey = category + '_tracker_data';
-    const jsonString = JSON.stringify(data);
-    localStorage.setItem(storageKey, jsonString);
-
-    // Vẽ lại Heatmap để thấy thay đổi màu sắc
-    renderHeatmap(category);
-
-    alert("Đã lưu thành công cho ngày " + currentSelectedDate);
-}
-
-// Hàm phụ: Đọc dữ liệu từ Storage (trả về Object)
-function loadDataFromStorage(category) {
-    const storageKey = category + '_tracker_data';
-    const rawData = localStorage.getItem(storageKey);
-    
-    if (rawData == null) {
-        return {}; // Trả về object rỗng nếu chưa có gì
-    } else {
-        return JSON.parse(rawData);
-    }
-}
-
-// --- 7. LOGIC TÍNH STREAK (CHUỖI LIÊN TIẾP) ---
-function calculateStreak(category, data) {
-    let streak = 0;
-    const today = new Date();
-
-    // Duyệt ngược 365 ngày từ hôm nay về quá khứ
-    for (let i = 0; i < 365; i++) {
-        const d = new Date();
-        d.setDate(today.getDate() - i); // Trừ đi i ngày
-
-        // Tạo chuỗi YYYY-MM-DD
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const dateStr = y + "-" + m + "-" + day;
-
-        const dayInfo = data[dateStr];
-
-        if (dayInfo != null && dayInfo.isDone == true) {
-            streak = streak + 1;
-        } else {
-            // Nếu hôm nay (i=0) chưa làm thì không tính là gãy streak, bỏ qua
-            if (i == 0) {
-                continue;
-            } else {
-                // Nếu ngày quá khứ mà chưa làm -> Đứt chuỗi
-                break;
-            }
-        }
-    }
-
-    // Hiển thị lên màn hình
-    const streakId = category + '-streak';
-    const element = document.getElementById(streakId);
-    if (element != null) {
-        element.innerText = streak;
-    }
-}
-
-// --- 8. LOGIC ĐẾM NGƯỢC (COUNTDOWN) ---
-function addEvent() {
-    const nameInput = document.getElementById('event-name');
-    const timeInput = document.getElementById('event-time');
-    const colorInput = document.getElementById('event-color');
-
-    const name = nameInput.value;
-    const time = timeInput.value;
-    const color = colorInput.value;
-
-    if (name == "" || time == "") {
-        alert("Nhập thiếu thông tin rồi bro!");
-        return;
-    }
-
-    // Lấy danh sách cũ
-    let events = [];
-    const raw = localStorage.getItem('countdown_events');
-    if (raw != null) {
-        events = JSON.parse(raw);
-    }
-
-    // Thêm mới
-    events.push({
-        name: name,
-        time: time,
-        color: color
-    });
-
-    // Lưu lại
-    localStorage.setItem('countdown_events', JSON.stringify(events));
-
-    // Vẽ lại danh sách
-    renderCountdownList();
-    
-    // Reset form
-    nameInput.value = "";
-    timeInput.value = "";
-}
-
-function renderCountdownList() {
-    const container = document.getElementById('countdown-list');
-    container.innerHTML = "";
-
-    let events = [];
-    const raw = localStorage.getItem('countdown_events');
-    if (raw != null) {
-        events = JSON.parse(raw);
-    }
-
-    for (let i = 0; i < events.length; i++) {
-        const evt = events[i];
-        
-        const div = document.createElement('div');
-        div.className = 'countdown-item';
-        // Thêm màu viền theo ý thích
-        div.style.borderColor = evt.color;
-
-        // Tạo id riêng cho cái đồng hồ để lát update
-        const timerId = 'timer-display-' + i;
-
-        div.innerHTML = '<h3>' + evt.name + '</h3>' +
-                        '<div id="' + timerId + '" class="timer-number">Loading...</div>' +
-                        '<p>Hạn chót: ' + evt.time + '</p>';
-        
         container.appendChild(div);
     }
+
+    // Tính Streak (Đếm ngược từ hôm nay)
+    const today = getTodayStr();
+    let tempDate = new Date();
+    for(let k=0; k<365; k++) {
+        const checkDay = new Date(tempDate.getTime() - (tempDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        if (allData[checkDay] && allData[checkDay].done) {
+            streak++;
+        } else if (checkDay !== today) { // Nếu không phải hôm nay mà thiếu -> gãy
+            break;
+        }
+        tempDate.setDate(tempDate.getDate() - 1);
+    }
+    document.getElementById(type + '-streak').innerText = streak;
 }
 
-function startCountdownLoop() {
-    // Nếu đang chạy thì tắt cái cũ đi
-    if (countdownTimerId != null) {
-        clearInterval(countdownTimerId);
-    }
+// --- LOGIC CHỌN NGÀY VÀ LƯU ---
+function selectDate(type, dateStr) {
+    currentSelectedDate = dateStr;
+    
+    // Update tiêu đề bên phải
+    document.getElementById(type + '-date-title').innerText = "Ngày: " + dateStr;
 
-    // Chạy mỗi 1 giây (1000ms)
-    countdownTimerId = setInterval(function() {
-        let events = [];
-        const raw = localStorage.getItem('countdown_events');
-        if (raw != null) {
-            events = JSON.parse(raw);
-        }
+    // Load lại Heatmap để cập nhật viền đỏ
+    renderHeatmap(type);
 
+    // Load dữ liệu ra form
+    const allData = JSON.parse(localStorage.getItem(type + '_data') || "{}");
+    const data = allData[dateStr] || { done: false, note: "" };
+
+    document.getElementById(type + '-check').checked = data.done;
+    document.getElementById(type + '-note').value = data.note;
+}
+
+function saveData(type) {
+    if (!currentSelectedDate) return alert("Chưa chọn ngày bro ơi!");
+
+    const done = document.getElementById(type + '-check').checked;
+    const note = document.getElementById(type + '-note').value;
+
+    const allData = JSON.parse(localStorage.getItem(type + '_data') || "{}");
+    allData[currentSelectedDate] = { done: done, note: note };
+
+    localStorage.setItem(type + '_data', JSON.stringify(allData));
+    
+    renderHeatmap(type); // Vẽ lại để hiện màu cam
+    alert("Đã lưu ngày " + currentSelectedDate);
+}
+
+// --- LOGIC COUNTDOWN ---
+function addEvent() {
+    const name = document.getElementById('event-name').value;
+    const time = document.getElementById('event-time').value;
+    const color = document.getElementById('event-color').value;
+    
+    if(!name || !time) return alert("Nhập thiếu rồi!");
+
+    const events = JSON.parse(localStorage.getItem('events') || "[]");
+    events.push({ name, time, color });
+    localStorage.setItem('events', JSON.stringify(events));
+    
+    renderEvents();
+}
+
+function renderEvents() {
+    const list = document.getElementById('countdown-list');
+    list.innerHTML = "";
+    const events = JSON.parse(localStorage.getItem('events') || "[]");
+
+    events.forEach((evt, idx) => {
+        const div = document.createElement('div');
+        div.className = 'countdown-item';
+        div.style.borderColor = evt.color;
+        div.innerHTML = `<h3 style="color:${evt.color}">${evt.name}</h3>
+                         <div id="timer-${idx}" style="font-size:1.5em; font-weight:bold">...</div>
+                         <p>${evt.time}</p>`;
+        list.appendChild(div);
+    });
+}
+
+function startCountdown() {
+    if(countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        const events = JSON.parse(localStorage.getItem('events') || "[]");
         const now = new Date().getTime();
 
-        for (let i = 0; i < events.length; i++) {
-            const evt = events[i];
-            const targetTime = new Date(evt.time).getTime();
-            const distance = targetTime - now;
-
-            const element = document.getElementById('timer-display-' + i);
-            
-            // Chỉ update nếu phần tử đó đang hiển thị trên màn hình
-            if (element != null) {
-                if (distance < 0) {
-                    element.innerText = "ĐÃ DIỄN RA!";
-                    element.style.color = "gray";
+        events.forEach((evt, idx) => {
+            const el = document.getElementById(`timer-${idx}`);
+            if(el) {
+                const dist = new Date(evt.time).getTime() - now;
+                if(dist < 0) {
+                    el.innerText = "Đã diễn ra!";
                 } else {
-                    // Công thức quy đổi thời gian
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    element.innerText = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
-                    element.style.color = evt.color;
+                    const d = Math.floor(dist / (86400000));
+                    const h = Math.floor((dist % (86400000)) / (3600000));
+                    const m = Math.floor((dist % (3600000)) / (60000));
+                    const s = Math.floor((dist % (60000)) / 1000);
+                    el.innerText = `${d}d ${h}h ${m}m ${s}s`;
                 }
             }
-        }
+        });
     }, 1000);
+    renderEvents(); // Gọi 1 lần đầu tiên
 }
