@@ -1,0 +1,145 @@
+/* Reset cơ bản */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Nunito', sans-serif; /* Font tròn trịa dễ thương */
+    background-color: #fff8e1; /* Màu nền kem nhạt */
+    color: #4a4a4a;
+    padding: 20px;
+}
+
+/* Navigation Bar */
+.navigation-bar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    background-color: #ffe0b2; /* Cam pastel nhạt */
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.nav-button {
+    background-color: white;
+    border: 2px solid #ffb74d;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #e65100;
+    transition: all 0.3s;
+}
+
+.nav-button:hover {
+    background-color: #ffb74d;
+    color: white;
+}
+
+/* Section styling */
+.content-section {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(255, 183, 77, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1, h2 {
+    color: #ef6c00;
+    margin-bottom: 20px;
+}
+
+.highlight-text {
+    font-size: 1.5em;
+    color: #e65100;
+    font-weight: 800;
+}
+
+.action-button {
+    background-color: #ffb74d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.action-button:hover {
+    background-color: #fb8c00;
+}
+
+/* Heatmap Grid (Github Style) */
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15px, 1fr)); /* Tự chia cột */
+    gap: 4px;
+    margin-top: 20px;
+}
+
+.heatmap-box {
+    width: 15px;
+    height: 15px;
+    background-color: #eee; /* Màu xám khi chưa tập */
+    border-radius: 2px;
+}
+
+.heatmap-box.active {
+    background-color: #ff9800; /* Màu cam khi đã tập */
+    box-shadow: 0 0 5px #ffcc80;
+}
+
+/* Log Box */
+textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 2px solid #ffe0b2;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-family: inherit;
+}
+
+.log-item {
+    background-color: #fff3e0;
+    padding: 15px;
+    border-left: 5px solid #ffb74d;
+    margin-bottom: 10px;
+    white-space: pre-wrap; /* Giữ nguyên xuống dòng của log */
+    border-radius: 5px;
+}
+
+/* Countdown Box */
+.add-event-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.countdown-item {
+    background-color: #fff3e0;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    border: 2px solid;
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 2em;
+    font-weight: bold;
+    font-family: monospace;
+}
